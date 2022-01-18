@@ -2,6 +2,8 @@
 
 Playing around with Go 1.18's new Generics feature. (... requires go1.18+ to run )
 
+Current supports generic `Query` execution and `QueryRow` execution.
+
 Given these tables:
 ```sql
 create table products(product_no integer, product_name text, price integer)
@@ -33,7 +35,7 @@ func ProductMapper(a ...pgtype.Value) Product {
 }
 ```
 
-Not that this is a huge improvement in typing code, but one thing to note is that this is much easier to test than the current interface provided by `database/sql` package.
+Note that this is not a huge improvement in typing code, but one thing to note is that this is much easier to test than the current interface provided by `database/sql` package. I personally think this callback method is a lot easier to reason about as the callback function doesn't hide the nitty-gritty postgres details, e.g. could this column be null.
 
 With the columns we are scanning defined, and a mapping callback to map the columns into a Go struct, we can now execute a query.
 
@@ -55,5 +57,5 @@ q1 := NewQuerier(conn, query, PurchaseColumns, PurchaseMapper)
 purchase, err := q1.QueryRow(context.Background(), 0)
 
 // Prints {0 1 1000 alice 2022-01-18 07:34:28.796139 -0700 MST}
-fmt.Println(product)
+fmt.Println(purchase)
 ```
